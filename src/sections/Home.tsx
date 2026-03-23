@@ -5,10 +5,12 @@
 
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { Play, ChevronRight } from 'lucide-react';
 
 export default function Home() {
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <section className="relative min-h-screen flex flex-col justify-between py-32 px-6 max-w-7xl mx-auto w-full pointer-events-none">
@@ -82,7 +84,7 @@ export default function Home() {
           className="flex-1 flex justify-center pointer-events-auto"
         >
           <button
-            onClick={() => document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => navigate('/pricing')}
             className="group relative px-12 py-5 bg-yellow-500 text-black font-black uppercase tracking-widest overflow-hidden transition-transform hover:scale-105 active:scale-95"
           >
             <span className="relative z-10 flex items-center gap-2">

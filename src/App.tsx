@@ -5,41 +5,37 @@
 
 import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { 
-  OrbitControls, 
-  Float, 
+import {
+  OrbitControls,
+  Float,
   PerspectiveCamera,
   Environment,
   ContactShadows
 } from '@react-three/drei';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'motion/react';
-import { 
-  User, 
-  ShoppingBag, 
-  Menu, 
+import { useNavigate } from 'react-router-dom';
+import {
+  User,
+  ShoppingBag,
+  Menu,
   X,
-  Zap
+  Zap,
 } from 'lucide-react';
 import * as THREE from 'three';
 
-// Import sections
 import Home from './sections/Home';
 import About from './sections/About';
 import Learn from './sections/Learn';
 import Book from './sections/Book';
 
-// --- 3D Components ---
+// ─── 3D ───────────────────────────────────────────────────────────────────────
 
 function DumbbellModel({ scrollYProgress }: { scrollYProgress: any }) {
   const group = useRef<THREE.Group>(null);
-
-  // Transform scroll progress to 3D positions and rotations
   const x = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [2, -2, 2, 0]);
   const y = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [0, 0.5, -0.5, 0]);
   const rotationZ = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [0, Math.PI / 2, -Math.PI / 4, Math.PI * 2]);
   const scale = useTransform(scrollYProgress, [0, 0.33, 0.66, 1], [1.5, 1.2, 1.8, 1.5]);
-
-  // Use spring for smoother movement
   const springX = useSpring(x, { stiffness: 50, damping: 20 });
   const springY = useSpring(y, { stiffness: 50, damping: 20 });
   const springRotationZ = useSpring(rotationZ, { stiffness: 50, damping: 20 });
@@ -61,30 +57,18 @@ function DumbbellModel({ scrollYProgress }: { scrollYProgress: any }) {
         <cylinderGeometry args={[0.05, 0.05, 2, 32]} />
         <meshStandardMaterial color="#333" metalness={0.8} roughness={0.2} />
       </mesh>
-      <mesh position={[0, 0.7, 0]} castShadow>
-        <cylinderGeometry args={[0.4, 0.4, 0.15, 32]} />
-        <meshStandardMaterial color="#111" metalness={0.5} roughness={0.5} />
-      </mesh>
-      <mesh position={[0, 0.9, 0]} castShadow>
-        <cylinderGeometry args={[0.35, 0.35, 0.15, 32]} />
-        <meshStandardMaterial color="#111" metalness={0.5} roughness={0.5} />
-      </mesh>
-      <mesh position={[0, -0.7, 0]} castShadow>
-        <cylinderGeometry args={[0.4, 0.4, 0.15, 32]} />
-        <meshStandardMaterial color="#111" metalness={0.5} roughness={0.5} />
-      </mesh>
-      <mesh position={[0, -0.9, 0]} castShadow>
-        <cylinderGeometry args={[0.35, 0.35, 0.15, 32]} />
-        <meshStandardMaterial color="#111" metalness={0.5} roughness={0.5} />
-      </mesh>
-      <mesh position={[0, 0.78, 0]}>
-        <cylinderGeometry args={[0.41, 0.41, 0.02, 32]} />
-        <meshStandardMaterial color="#eab308" emissive="#eab308" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh position={[0, -0.78, 0]}>
-        <cylinderGeometry args={[0.41, 0.41, 0.02, 32]} />
-        <meshStandardMaterial color="#eab308" emissive="#eab308" emissiveIntensity={0.5} />
-      </mesh>
+      {[0.7, 0.9, -0.7, -0.9].map((pos, i) => (
+        <mesh key={i} position={[0, pos, 0]} castShadow>
+          <cylinderGeometry args={[i % 2 === 0 ? 0.4 : 0.35, i % 2 === 0 ? 0.4 : 0.35, 0.15, 32]} />
+          <meshStandardMaterial color="#111" metalness={0.5} roughness={0.5} />
+        </mesh>
+      ))}
+      {[0.78, -0.78].map((pos, i) => (
+        <mesh key={i} position={[0, pos, 0]}>
+          <cylinderGeometry args={[0.41, 0.41, 0.02, 32]} />
+          <meshStandardMaterial color="#eab308" emissive="#eab308" emissiveIntensity={0.5} />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -106,10 +90,10 @@ function Scene({ scrollYProgress }: { scrollYProgress: any }) {
   );
 }
 
-// --- UI Components ---
+// ─── Nav ──────────────────────────────────────────────────────────────────────
 
 const NavItem = ({ label, active, onClick }: { label: string; active?: boolean; onClick: () => void }) => (
-  <button 
+  <button
     onClick={onClick}
     className={`relative px-4 py-2 text-sm font-medium transition-colors duration-300 ${
       active ? 'text-yellow-500' : 'text-gray-400 hover:text-white'
@@ -122,20 +106,23 @@ const NavItem = ({ label, active, onClick }: { label: string; active?: boolean; 
   </button>
 );
 
+// ─── App ──────────────────────────────────────────────────────────────────────
+
 export default function App() {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ['start start', 'end end'],
   });
 
   const navItems = [
-    { label: 'Home', id: 'home' },
-    { label: 'About', id: 'about' },
-    { label: 'Learn', id: 'learn' },
-    { label: 'Book', id: 'book' }
+    { label: 'Home',    id: 'home'  },
+    { label: 'About',   id: 'about' },
+    { label: 'Learn',   id: 'learn' },
+    { label: 'Book',    id: 'book'  },
   ];
 
   const scrollToSection = (id: string) => {
@@ -147,12 +134,10 @@ export default function App() {
     }
   };
 
-  // Update active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
       const sections = navItems.map(item => document.getElementById(item.id));
       const scrollPosition = window.scrollY + window.innerHeight / 3;
-
       sections.forEach(section => {
         if (section) {
           const sectionTop = section.offsetTop;
@@ -163,16 +148,16 @@ export default function App() {
         }
       });
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <div ref={containerRef} className="relative w-full bg-[#050505] text-white font-sans selection:bg-yellow-500 selection:text-black">
+
       {/* Fixed Background Text */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-0">
-        <motion.h1 
+        <motion.h1
           style={{ opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.05, 0.02, 0.05]) }}
           className="text-[25vw] font-black tracking-tighter text-white leading-none uppercase"
         >
@@ -201,20 +186,49 @@ export default function App() {
           </div>
         </div>
 
+        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-2">
           {navItems.map((item) => (
-            <NavItem 
-              key={item.id} 
-              label={item.label} 
-              active={activeSection === item.id} 
-              onClick={() => scrollToSection(item.id)} 
+            <NavItem
+              key={item.id}
+              label={item.label}
+              active={activeSection === item.id}
+              onClick={() => scrollToSection(item.id)}
             />
           ))}
+          {/* Pricing as a nav link → goes to /pricing page */}
+          <button
+            onClick={() => navigate('/pricing')}
+            className="relative px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300"
+          >
+            Pricing
+          </button>
         </nav>
 
         <div className="flex items-center gap-6">
-          <button className="hidden md:block text-gray-400 hover:text-white transition-colors"><User size={20} /></button>
-          <button className="hidden md:block text-gray-400 hover:text-white transition-colors"><ShoppingBag size={20} /></button>
+          <button className="hidden md:block text-gray-400 hover:text-white transition-colors">
+            <User size={20} />
+          </button>
+
+          {/* Shopping bag → /pricing page
+          <button
+            className="hidden md:flex relative text-gray-400 hover:text-yellow-500 transition-colors duration-200"
+            onClick={() => navigate('/pricing')}
+            title="View Membership Rates"
+          >
+            <ShoppingBag size={20} />
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+          </button> */}
+
+          {/* Mobile shopping bag */}
+          <button
+            className="md:hidden relative text-gray-400 hover:text-yellow-500 transition-colors"
+            onClick={() => navigate('/pricing')}
+          >
+            <ShoppingBag size={22} />
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+          </button>
+
           <button className="md:hidden text-white" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -224,21 +238,42 @@ export default function App() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, x: '100%' }} 
-            animate={{ opacity: 1, x: 0 }} 
-            exit={{ opacity: 0, x: '100%' }} 
-            className="fixed inset-0 z-40 bg-black pt-32 px-8 flex flex-col gap-8 md:hidden"
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            className="fixed inset-0 z-40 bg-black pt-28 px-8 flex flex-col gap-4 md:hidden"
           >
-            {navItems.map((item) => (
-              <button 
-                key={item.id} 
-                onClick={() => scrollToSection(item.id)} 
-                className={`text-6xl font-black tracking-tighter text-left uppercase ${activeSection === item.id ? 'text-yellow-500' : 'text-white'}`}
+            {navItems.map((item, i) => (
+              <motion.button
+                key={item.id}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                onClick={() => scrollToSection(item.id)}
+                className={`text-4xl font-black tracking-tighter text-left uppercase transition-colors ${
+                  activeSection === item.id ? 'text-yellow-500' : 'text-white/80 hover:text-white'
+                }`}
               >
                 {item.label}
-              </button>
+              </motion.button>
             ))}
+            {/* Pricing → navigates to page */}
+            <motion.button
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: navItems.length * 0.05 }}
+              onClick={() => { navigate('/pricing'); setIsMenuOpen(false); }}
+              className="text-4xl font-black tracking-tighter text-left uppercase text-white/80 hover:text-white transition-colors"
+            >
+              Pricing
+            </motion.button>
+
+            {/* Bottom info */}
+            <div className="mt-auto pb-12 flex flex-col gap-1">
+              <p className="text-[10px] font-bold tracking-[0.3em] text-gray-700 uppercase">Kaizen Fitness Marikina</p>
+              <p className="text-[10px] font-bold tracking-[0.2em] text-gray-700 uppercase">0917 312 1166</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -251,19 +286,21 @@ export default function App() {
         <div id="book"><Book /></div>
       </main>
 
-      {/* Fixed UI Elements */}
-     <div className="fixed right-0 sm:right-16 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 pointer-events-none z-0 sm:z-30">
-  <div className="h-24 w-px bg-gray-800" />
-  <span className="rotate-90 text-[10px] font-bold tracking-[0.3em] text-yellow-500 uppercase whitespace-nowrap">EST. 2024 / MARIKINA</span>
-  <div className="h-24 w-px bg-gray-800" />
-</div>
+      {/* Fixed side label */}
+      <div className="fixed right-0 sm:right-16 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 pointer-events-none z-0 sm:z-30">
+        <div className="h-24 w-px bg-gray-800" />
+        <span className="rotate-90 text-[10px] font-bold tracking-[0.3em] text-yellow-500 uppercase whitespace-nowrap">
+          EST. 2024 / MARIKINA
+        </span>
+        <div className="h-24 w-px bg-gray-800" />
+      </div>
 
       <div className="fixed bottom-6 left-6 text-[10px] font-bold tracking-widest text-gray-600 uppercase pointer-events-none z-30">
         KAIZEN FITNESS MARIKINA / PH
       </div>
 
       {/* Scroll Progress Bar */}
-      <motion.div 
+      <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-yellow-500 origin-left z-[60]"
         style={{ scaleX: scrollYProgress }}
       />

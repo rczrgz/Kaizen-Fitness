@@ -94,8 +94,6 @@ export default function Book() {
         <div className="w-[600px] h-[600px] rounded-full bg-yellow-500/5 blur-[120px]" />
       </div>
 
-      {/* Decorative large BK letters */}
-
       <AnimatePresence mode="wait">
         {submitted ? (
           <motion.div
@@ -234,12 +232,12 @@ export default function Book() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={!name || !email}
-                className={`mt-2 py-6 font-black uppercase tracking-widest text-lg flex items-center justify-center gap-3 transition-all duration-200
+                className={`mt-2 w-full min-h-[64px] py-5 px-6 font-black uppercase tracking-widest text-base md:text-lg flex items-center justify-center gap-3 transition-all duration-200 touch-manipulation
                   ${name && email
                     ? 'bg-yellow-500 text-black hover:bg-white cursor-pointer'
                     : 'bg-yellow-500/20 text-yellow-500/40 cursor-not-allowed'}`}
               >
-                <Zap size={18} className="fill-current" />
+                <Zap size={20} className="fill-current shrink-0" />
                 Confirm Booking
               </motion.button>
 

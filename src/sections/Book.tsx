@@ -95,9 +95,6 @@ export default function Book() {
       </div>
 
       {/* Decorative large BK letters */}
-      <span className="pointer-events-none select-none absolute -left-8 top-1/2 -translate-y-1/2 text-[22vw] font-black text-white/[0.03] uppercase italic leading-none">
-        BK
-      </span>
 
       <AnimatePresence mode="wait">
         {submitted ? (

@@ -38,44 +38,45 @@ const MemberModal = ({ member, onClose }: { member: TeamMember; onClose: () => v
       <motion.div
         className="absolute inset-0 bg-black/70 backdrop-blur-md"
         onClick={onClose}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
       />
 
-      {/* panel — mt-16 on mobile keeps it below the fixed header so the X button is always reachable */}
+      {/* panel */}
       <motion.div
         className="relative w-full md:max-w-2xl bg-[#0d0d0d] border border-gray-800 rounded-t-3xl md:rounded-3xl overflow-hidden mt-16 md:mt-0"
         style={{ maxHeight: 'calc(100vh - 64px)' }}
-        initial={{ y: 60, opacity: 0 }}
+        initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 60, opacity: 0 }}
+        exit={{ y: 80, opacity: 0 }}
         transition={{ type: 'spring', damping: 26, stiffness: 280 }}
       >
-        {/* scrollable inner container */}
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
-          {/* ── Top bar: drag handle + close button ── */}
-          <div className="flex items-center justify-between px-4 pt-10 pb-1 sticky top-0 bg-[#0d0d0d] z-10">
-            <div className="flex-1" />
-            <div className="flex-1 flex justify-end">
-              <button
-                onClick={onClose}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          </div>
+        {/* ── Desktop-only: close button top-right of panel ── */}
+        <button
+          onClick={onClose}
+          className="hidden md:flex absolute top-4 right-4 w-9 h-9 items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all z-10"
+        >
+          <X size={16} />
+        </button>
 
-          <div className="flex flex-col md:flex-row gap-0">
-            {/* photo */}
-            <div className="w-full md:w-56 h-56 md:h-auto flex-shrink-0 relative">
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
+          <div className="flex flex-col md:flex-row">
+
+            {/* ── Photo ── */}
+            <div className="relative w-full md:w-56 h-72 md:h-auto flex-shrink-0">
               <img
                 src={member.image}
                 alt={member.name}
                 className="w-full h-full object-cover object-top"
               />
+              {/* gradient */}
               <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0d0d0d] via-transparent to-transparent" />
+
+              {/* Mobile-only: X button top-left of photo */}
+              <button
+                onClick={onClose}
+                className="md:hidden absolute top-10 right-4 w-9 h-10 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white transition-all backdrop-blur-sm z-10"
+              >
+                <X size={16} />
+              </button>
             </div>
 
             {/* content */}
@@ -143,7 +144,7 @@ const CEOCard = (member: TeamMember) => {
 
           {/* mobile tap badge */}
           <div className="md:hidden absolute bottom-3 right-3 bg-yellow-500/90 text-black text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg">
-            Check
+            Tap
           </div>
         </div>
 

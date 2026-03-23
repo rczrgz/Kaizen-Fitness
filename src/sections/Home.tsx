@@ -33,8 +33,8 @@ export default function Home() {
           className="flex flex-col gap-2 pointer-events-auto"
         >
           <div className="flex items-baseline gap-2">
-            <span className="text-6xl font-black tracking-tighter text-yellow-500">$49.99</span>
-            <span className="text-gray-500 line-through text-xl">$79.99</span>
+            <span className="text-6xl font-black tracking-tighter text-yellow-500">₱16,500</span>
+            <span className="text-gray-500 line-through text-xl">₱22,000</span>
           </div>
           <div className="flex flex-col text-xs font-bold tracking-widest text-gray-500 uppercase">
             <span>MEMBERSHIP • MONTHLY</span>

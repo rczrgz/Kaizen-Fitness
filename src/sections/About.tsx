@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Phone, Dumbbell, Zap, Target, BookOpen, X, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Dumbbell, Zap, Target, BookOpen, X, CheckCircle2, ChevronRight } from 'lucide-react';
 import image1 from '../assets/image1.png';
 import image2 from '../assets/image2.png';
 import image3 from '../assets/image3.png';
@@ -21,136 +21,166 @@ type TeamMember = {
   name: string;
   role: string;
   image: string;
+  bio: string;
   highlights: string[];
 };
 
-const CEOCard = ({ name, role, image, highlights }: TeamMember) => {
-  const [tapped, setTapped] = useState(false);
+/* ── Modal ── */
+const MemberModal = ({ member, onClose }: { member: TeamMember; onClose: () => void }) => (
+  <AnimatePresence>
+    <motion.div
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center px-0 md:px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {/* backdrop */}
+      <motion.div
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
 
-  return (
-    <>
-      {/* Card */}
-      <div
-        className="flex flex-col gap-4 group"
-        onClick={() => setTapped(true)}
+      {/* panel — mt-16 on mobile keeps it below the fixed header so the X button is always reachable */}
+      <motion.div
+        className="relative w-full md:max-w-2xl bg-[#0d0d0d] border border-gray-800 rounded-t-3xl md:rounded-3xl overflow-hidden mt-16 md:mt-0"
+        style={{ maxHeight: 'calc(100vh - 64px)' }}
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 60, opacity: 0 }}
+        transition={{ type: 'spring', damping: 26, stiffness: 280 }}
       >
-        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-gray-800 group-hover:border-yellow-500 md:group-hover:border-yellow-500 transition-colors cursor-pointer">
-          <img
-            src={image}
-            alt={name}
-            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-          {/* Mobile tap hint badge */}
-          <div className="md:hidden absolute bottom-3 right-3 bg-yellow-500/90 text-black text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full">
-            Tap to view
-          </div>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-xl font-black tracking-tighter uppercase italic">{name}</span>
-          <span className="text-xs font-bold tracking-widest text-yellow-500 uppercase">{role}</span>
-        </div>
-      </div>
-
-      {/* Mobile full-screen overlay */}
-      <AnimatePresence>
-        {tapped && (
-          <motion.div
-            className="md:hidden fixed inset-0 z-50 flex flex-col"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
-            {/* Blurred backdrop */}
-            <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setTapped(false)}
-            />
-
-            {/* Card panel slides up */}
-            <motion.div
-              className="relative mt-auto bg-[#0d0d0d] border-t border-gray-800 rounded-t-3xl overflow-hidden"
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            >
-              {/* Drag handle */}
-              <div className="flex justify-center pt-3 pb-1">
-                <div className="w-10 h-1 rounded-full bg-gray-700" />
-              </div>
-
-              {/* Close button */}
+        {/* scrollable inner container */}
+        <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
+          {/* ── Top bar: drag handle + close button ── */}
+          <div className="flex items-center justify-between px-4 pt-10 pb-1 sticky top-0 bg-[#0d0d0d] z-10">
+            <div className="flex-1" />
+            <div className="flex-1 flex justify-end">
               <button
-                onClick={() => setTapped(false)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                onClick={onClose}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white transition-all"
               >
                 <X size={16} />
               </button>
+            </div>
+          </div>
 
-              {/* Content */}
-              <div className="flex gap-5 px-6 pt-4 pb-2 items-start">
-                {/* Color photo thumbnail */}
-                <div className="w-24 h-28 rounded-xl overflow-hidden border border-yellow-500/40 flex-shrink-0">
-                  <img src={image} alt={name} className="w-full h-full object-cover" />
-                </div>
+          <div className="flex flex-col md:flex-row gap-0">
+            {/* photo */}
+            <div className="w-full md:w-56 h-56 md:h-auto flex-shrink-0 relative">
+              <img
+                src={member.image}
+                alt={member.name}
+                className="w-full h-full object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0d0d0d] via-transparent to-transparent" />
+            </div>
 
-                {/* Name + role */}
-                <div className="flex flex-col justify-center gap-1 pt-1">
-                  <span className="text-2xl font-black tracking-tighter uppercase italic leading-tight">{name}</span>
-                  <span className="text-[11px] font-bold tracking-widest text-yellow-500 uppercase">{role}</span>
-                  <div className="mt-2 w-8 h-0.5 bg-yellow-500/60 rounded-full" />
-                </div>
+            {/* content */}
+            <div className="flex flex-col gap-5 px-6 pb-10 pt-5 md:pt-8">
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.3em] text-yellow-500 uppercase mb-1">{member.role}</p>
+                <h3 className="text-3xl font-black tracking-tighter uppercase italic leading-tight">{member.name}</h3>
+                <div className="mt-2 w-10 h-0.5 bg-yellow-500 rounded-full" />
               </div>
 
-              {/* Highlights */}
-              <div className="px-6 pt-4 pb-10">
+              <p className="text-sm text-gray-400 leading-relaxed">{member.bio}</p>
+
+              <div>
                 <p className="text-[10px] font-bold tracking-[0.25em] text-gray-500 uppercase mb-3">Highlights</p>
-                <ul className="flex flex-col gap-3">
-                  {highlights.map((point, i) => (
+                <ul className="flex flex-col gap-2.5">
+                  {member.highlights.map((point, i) => (
                     <motion.li
                       key={i}
-                      initial={{ opacity: 0, x: -10 }}
+                      initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 + i * 0.07 }}
+                      transition={{ delay: 0.08 + i * 0.07 }}
                       className="flex items-start gap-3 text-sm text-gray-300 leading-snug"
                     >
-                      <CheckCircle2 size={15} className="text-yellow-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 size={14} className="text-yellow-500 mt-0.5 flex-shrink-0" />
                       {point}
                     </motion.li>
                   ))}
                 </ul>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  </AnimatePresence>
+);
+
+/* ── Card ── */
+const CEOCard = (member: TeamMember) => {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  return (
+    <>
+      <div
+        className="flex flex-col gap-4 group cursor-pointer"
+        onClick={() => setModalOpen(true)}
+      >
+        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-gray-800 group-hover:border-yellow-500 transition-colors duration-300">
+          <img
+            src={member.image}
+            alt={member.name}
+            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 scale-105 group-hover:scale-100"
+          />
+
+          {/* hover overlay slides up from bottom */}
+          <div className="absolute inset-0 flex flex-col justify-end">
+            <div className="translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-gradient-to-t from-black via-black/80 to-transparent pt-16 px-5 pb-5 flex flex-col gap-3">
+              <p className="text-gray-300 text-xs leading-relaxed line-clamp-3">{member.bio}</p>
+              <div className="flex items-center gap-1.5 text-yellow-500 text-xs font-bold uppercase tracking-widest">
+                <span>View Full Profile</span>
+                <ChevronRight size={12} />
+              </div>
+            </div>
+          </div>
+
+          {/* mobile tap badge */}
+          <div className="md:hidden absolute bottom-3 right-3 bg-yellow-500/90 text-black text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg">
+            Check
+          </div>
+        </div>
+
+        <div className="flex flex-col">
+          <span className="text-xl font-black tracking-tighter uppercase italic">{member.name}</span>
+          <span className="text-xs font-bold tracking-widest text-yellow-500 uppercase">{member.role}</span>
+        </div>
+      </div>
+
+      {modalOpen && <MemberModal member={member} onClose={() => setModalOpen(false)} />}
     </>
   );
 };
 
+/* ── Data ── */
 const team: TeamMember[] = [
   {
     name: 'Tristan Birung',
     role: 'Founder & Head Coach',
     image: image1,
+    bio: 'Tristan built Kaizen Fitness from the ground up with one mission: create a space where every athlete, regardless of level, can chase continuous improvement.',
     highlights: [
       'Founded Kaizen Fitness Marikina in 2024',
-      'Certified strength & conditioning specialist with 8+ years of coaching',
+      'Certified strength & conditioning specialist — 8+ years coaching',
       'Led 200+ athletes to their personal bests',
-      'Specialist in functional training and HYROX competition prep',
+      'Specialist in HYROX competition prep & functional training',
     ],
   },
   {
     name: 'Christian Llyod Birung',
     role: 'Operations Director',
     image: image2,
+    bio: 'Christian keeps every part of the gym running at its best — from member experience to facility management — ensuring Kaizen remains the top training destination in Marikina.',
     highlights: [
-      'Oversees day-to-day gym operations and member experience',
-      'Scaled facility to the largest in the Marikina area',
-      'Expert in fitness business development and community building',
+      'Scaled facility to the largest gym in the Marikina area',
+      'Expert in fitness business development & community building',
+      'Oversees member onboarding, retention, and satisfaction',
       'Manages partnerships with leading equipment suppliers',
     ],
   },
@@ -158,15 +188,17 @@ const team: TeamMember[] = [
     name: 'Herald Birung',
     role: 'Performance Lead',
     image: image3,
+    bio: 'Herald designs the systems that make athletes better — from periodized programs to real-time performance tracking, he turns raw effort into measurable results.',
     highlights: [
-      'Designs periodized training programs for all athlete levels',
       'CrossFit Level 2 Trainer with competitive background',
-      'Leads group classes, personal training, and athlete assessments',
-      'Specialist in mobility, injury prevention, and performance tracking',
+      'Designs periodized programs for all athlete levels',
+      'Specialist in mobility, injury prevention & athlete assessment',
+      'Leads group classes, personal training & performance reviews',
     ],
   },
 ];
 
+/* ── Page ── */
 export default function About() {
   return (
     <section className="relative min-h-screen py-32 px-6 max-w-7xl mx-auto w-full flex flex-col gap-24">

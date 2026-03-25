@@ -88,7 +88,7 @@ export default function Home() {
             className="group relative px-12 py-5 bg-yellow-500 text-black font-black uppercase tracking-widest overflow-hidden transition-transform hover:scale-105 active:scale-95"
           >
             <span className="relative z-10 flex items-center gap-2">
-              JOIN THE TRIBE <ChevronRight size={20} />
+              Bading <ChevronRight size={20} />
             </span>
             <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
           </button>
